@@ -10,7 +10,7 @@ First, log in to Google Cloud Platform and in your current project, enter <em>Ve
      alt="Vertex AI Page"
      style="float: left; margin-right: 10px;" />
 
-From this screen, click on <em>NEW NOTEBOOK</em> at the top of the page, and from the dropdown that appears, select <em>TensorFlow Enterprise</em> &rarr; <em>TensorFlow Enterprise 2.10</em> rarr; <em>With 1 NVIDIA T4</em>. When the next pop-up appears, select <em>Advanced Options</em> at the bottom of the screen.
+From this screen, click on <em>NEW NOTEBOOK</em> at the top of the page, and from the dropdown that appears, select <em>TensorFlow Enterprise</em> &rarr; <em>TensorFlow Enterprise 2.10</em> &rarr; <em>With 1 NVIDIA T4</em>. When the next pop-up appears, select <em>Advanced Options</em> at the bottom of the screen.
 
 <img src="./assets/TF Enterprise.png"
      alt="TF Enterprise Screen"
