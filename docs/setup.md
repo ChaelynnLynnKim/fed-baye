@@ -6,15 +6,21 @@ There are a number of dependency considerations to take into account in this pro
 
 First, log in to Google Cloud Platform and in your current project, enter <em>Vertex AI</em> in the search bar. From the <em>Tools</em> section on the left side of the screen, select <em>Workbench</em>, which will take you to the following screen.
 
-![](fed-baye/docs/assets/Vertex AI.png)
+<img src="./assets/Vertex AI.png"
+     alt="Vertex AI Page"
+     style="float: left; margin-right: 10px;" />
 
 From this screen, click on <em>NEW NOTEBOOK</em> at the top of the page, and from the dropdown that appears, select <em>TensorFlow Enterprise</em> &rarr; <em>TensorFlow Enterprise 2.10</em> rarr; <em>With 1 NVIDIA T4</em>. When the next pop-up appears, select <em>Advanced Options</em> at the bottom of the screen.
 
-![](fed-baye/docs/assets/TF Enterprise.png)
+<img src="./assets/TF Enterprise.png"
+     alt="TF Enterprise Screen"
+     style="float: left; margin-right: 10px;" />
 
 In the <em>Machine Configuration</em> section, change the GPU from a NVIDIA T4 to the more powerful NVIDIA P100. Also ensure that the box next to "Install NVIDIA GPU driver automatically for me" is checked. Once complete, scroll to the bottom of the page, and click <em>Create</em>.
 
-![](fed-baye/docs/assets/Machine Configuration.png)
+<img src="./assets/Machine Configuration.png"
+     alt="Machine Configuration Pop-up"
+     style="float: left; margin-right: 10px;" />
 
 Once the Jupyter Notebook instance has been launched, click the <em>OPEN JUPYTERLAB</em> button to launch the Jupyter instance.
 
