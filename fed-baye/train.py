@@ -26,6 +26,7 @@ logger = logging.getLogger()
 
 
 def main(args):
+    
     if args.dataset == 'movie-lens':
         logger.info('Loading movie-lens data')
         ratings, movies, users = load_data()
@@ -82,9 +83,25 @@ def main(args):
         )
         logger.info(msg)
         
-    timestamp = datetime.now().strftime("%Y%m%d %H:%M:%S")
+    clip = int(args.clip)
+    if args.noise_multiplier == 0.0:
+        multiplier_str = '0'
+    elif args.noise_multiplier == 0.25:
+        multiplier_str = '025'
+    elif args.noise_multiplier == 0.50:
+        multiplier_str = '050'
+    elif args.noise_multiplier == 0.75:
+        multiplier_str = '075'
+    elif args.noise_multiplier == 1.0:
+        multiplier_str = '1'
+    elif args.noise_multiplier == 2.0:
+        multiplier_str = '2'
+    timestamp = datetime.now().strftime("%Y%m%d %H-%M-%S")
     model_type = 'bayesian' if args.bayesian else 'frequentist'
-    fname = f'results_{model_type}_{args.layers}-layers_{args.units}-units_{timestamp}.csv'
+    fname = (
+        f'results_{model_type}_layers-{args.layers}_units-{args.units}' +
+        f'_noise-{multiplier_str}_clip-{clip}_{timestamp}.csv'
+    )
     path = os.path.join(output_directory, fname)
     
     logger.info(f'Saving results to {path}')
