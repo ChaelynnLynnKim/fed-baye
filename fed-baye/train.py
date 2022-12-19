@@ -102,11 +102,13 @@ def main(args):
         f'results_{model_type}_layers-{args.layers}_units-{args.units}' +
         f'_noise-{multiplier_str}_clip-{clip}_{timestamp}.csv'
     )
+    
     path = os.path.join(output_directory, fname)
     
     logger.info(f'Saving results to {path}')
     results = pd.DataFrame({'Accuracy': acc_log, 'Loss': loss_log})
-    results.to_csv(path, index=False, mode='x')
+    # results.to_csv(path, index=False, mode='x')
+    results.to_csv(path, index=False)
     
     logger.info('Federated training complete')
     
