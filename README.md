@@ -1,5 +1,5 @@
-# fed-baye
-Bayesian FedRec with Differential Privacy
+# Bayesian FedRec with Differential Privacy
+
 
 # Team Members
 Kevin Schattin (ks3936) 
