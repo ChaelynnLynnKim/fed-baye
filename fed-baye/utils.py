@@ -1,12 +1,22 @@
-import collections
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 
 from typing import Optional, List, Tuple
 
 
-def load_data(dataset: str = 'movie-lens'):
+def load_data() -> Tuple[pd.DataFrame]:
+    """Loads rating, movie, and user subsets of MovieLens100k data
+
+    Loads relevant parts of MovieLens100k dataset,
+    including user viewing data, movie data, and user
+    demographic data, and extracts relevant columns
+
+    Returns
+    -------
+    Tuple[pd.DataFrame]
+        User viewing data, movie data, and demographic
+        data stored in three separate pandas dataframes
+    """
     # ratings data
     # user id | item id | rating | timestamp
     user_ids = []
@@ -65,54 +75,83 @@ def load_data(dataset: str = 'movie-lens'):
     return ratings, movies, users
 
 
-def create_tf_datasets(
+def create_datasets(
     ratings_df: pd.DataFrame,
-    batch_size: int = 1,
     max_examples_per_user: Optional[int] = None,
-    max_clients: Optional[int] = None
-) -> List[tf.data.Dataset]:
-    """Creates TF Datasets containing the movies and ratings for all users."""
-    if max_clients is not None:
-        num_users = min(len(ratings_df.user_id.unique()), max_clients)
-        
-    def rating_batch_map_fn(rating_batch):
-        """Maps a rating batch to an OrderedDict with tensor values."""
-        return collections.OrderedDict([
-            ("x", tf.cast(rating_batch[:, 0:2], tf.float32)),
-            ("y", tf.cast(rating_batch[:, 2:3], tf.float32))
-        ])
+) -> List[pd.DataFrame]:
+    """Splits centralized dataset into subsets by user
+
+    Args
+    ----
+    ratings_df : pd.DataFrame
+        Centralized dataset containing user ids, movie ids, and user-movie ratings
+
+    max_examples_per_user : int (optional)
+        The maximum number of examples records that should be included in a 
+        user subset. If greater than 0, randomly sample max_examples_per_user
+        records from user subset and discard remaining examples.
+
+    
+    Returns
+    -------
+    List[pd.DataFrame]
+        List of dataframes where each dataframe contains records from only a single user
+    """
+
+    if max_examples_per_user is not None:
+        sample_frac = min(max_examples_per_user / user_ratings_df.shape[0], 1)
+    else:
+        sample_frac = 1.0
 
     datasets = []
     for user_id in ratings_df.user_id.unique():
         user_ratings_df = ratings_df[ratings_df.user_id == user_id]
-        sample_frac = min(max_examples_per_user / user_ratings_df.shape[0], 1)
         user_ratings_df = user_ratings_df.sample(frac=sample_frac, replace=False)
         datasets.append(user_ratings_df)
-
-        # tf_dataset = tf.data.Dataset.from_tensor_slices(user_ratings_df)
-        # tf_dataset = (
-        #     tf_dataset.take(max_examples_per_user)
-        #     .shuffle(buffer_size=max_examples_per_user, seed=42)
-        #     .batch(batch_size)
-        #     .map(rating_batch_map_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        # )
-        # tf_datasets.append(tf_dataset)
 
     return datasets
             
 
-def split_tf_datasets(
-    tf_datasets: List[tf.data.Dataset],
+def split_datasets(
+    datasets: List[pd.DataFrame],
     train_fraction: float = 0.8,
     val_fraction: float = 0.1,
-) -> Tuple[List[tf.data.Dataset], List[tf.data.Dataset], List[tf.data.Dataset]]:
-    """Splits a list of user TF datasets into train/val/test by user."""
+) -> Tuple[List[pd.DataFrame], List[pd.DataFrame], List[pd.DataFrame]]:
+    """Splits a list of user datasets into train/val/test
+    
+    Splits list of federated datasets into train, validation, and test 
+    sets based on `train_fraction` and `val_fraction`. Given user will
+    only appear in one of train/val/test
+
+    Args
+    ----
+    datasets : List[pd.DataFrame]
+        List of user datasets containing user id, movie id, and rating information
+
+    train_fraction : float
+        Percentage of user datasets to include in training federated dataset
+
+    val_fraction : float
+        Percentage of user datasets to include in validation federated dataset
+
+
+    Returns
+    -------
+    Tuple[List[pd.DataFrame], List[pd.DataFrame], List[pd.DataFrame]]
+        A three-item tuple in which the first item is a list of user datasets for 
+        federated training, the second item is a list of user datasets for global
+        validation, and the third item is a list of user datasets for testing
+    """
+    
+    # set seed and shuffle list of user datasets
     np.random.seed(42)
-    np.random.shuffle(tf_datasets)
+    np.random.shuffle(datasets)
             
-    train_idx = int(len(tf_datasets) * train_fraction)
-    val_idx = int(len(tf_datasets) * (train_fraction + val_fraction))
+    # determine sizes of training, validation, and test sets
+    # based on `train_fraction` and `val_fraction``
+    train_idx = int(len(datasets) * train_fraction)
+    val_idx = int(len(datasets) * (train_fraction + val_fraction))
             
     return (
-        tf_datasets[:train_idx], tf_datasets[train_idx:val_idx], tf_datasets[val_idx:]
+        datasets[:train_idx], datasets[train_idx:val_idx], datasets[val_idx:]
     )
